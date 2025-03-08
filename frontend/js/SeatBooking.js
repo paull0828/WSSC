@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const seatsContainer = document.querySelector(".seats-container");
   const timeSelection = document.querySelector(".time-selection");
   const planDropdown = document.getElementById("plan-selection");
@@ -12,11 +12,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let selectedSeat = null;
 
+  // Backend API URL
+  const API_URL = "http://localhost:5000"; // Change as needed
+
   // Set minimum date to today
   const today = new Date();
   const formattedDate = today.toISOString().split("T")[0];
+  datePicker.value = formattedDate;
   datePicker.min = formattedDate;
-  //datePicker.value = formattedDate //Removed as per update
+
+  // Fetch booked seats from backend
+  async function fetchBookedSeats(date) {
+    try {
+      const response = await fetch(`${API_URL}/bookings/${date}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const bookedSeats = await response.json();
+      console.log("Booked Seats:", bookedSeats);
+
+      document.querySelectorAll(".seat").forEach((seat) => {
+        seat.classList.remove("booked", "selected");
+      });
+
+      bookedSeats.forEach(({ seatNumber }) => {
+        const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
+        if (seat) seat.classList.add("booked");
+      });
+    } catch (error) {
+      console.error("Error fetching booked seats:", error);
+    }
+  }
 
   // Time slots with pricing
   const timeSlots = {
@@ -41,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "10-hours": [
       { time: "8 AM - 6 PM", price: 1500 },
       { time: "9 AM - 7 PM", price: 1500 },
-      { time: "11 PM - 9 PM", price: 1750 },
+      { time: "11 AM - 9 PM", price: 1750 },
       { time: "12 PM - 10 PM", price: 1750 },
     ],
     "full-day": [{ time: "8 AM - 10 PM", price: 2000 }],
@@ -52,11 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const seat = document.createElement("div");
     seat.classList.add("seat");
     seat.textContent = i;
-
-    // Removed default booking logic as per update
+    seat.dataset.seat = i;
 
     seat.addEventListener("click", () => {
-      if (seat.classList.contains("booked")) return;
+      if (seat.classList.contains("booked")) {
+        showNotification("This seat is already booked!", "error");
+        return;
+      }
 
       if (selectedSeat) {
         selectedSeat.classList.remove("selected");
@@ -65,22 +93,25 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedSeat = seat;
       seat.classList.add("selected");
 
-      // Smooth scroll to booking details on mobile
       if (window.innerWidth < 768) {
         timeSelection.scrollIntoView({ behavior: "smooth" });
       }
 
-      resetSelections(); // Reset everything when a new seat is selected
+      resetSelections();
       timeSelection.style.display = "block";
     });
 
     seatsContainer.appendChild(seat);
   }
 
-  // Reset all selections when date is changed
-  datePicker.addEventListener("change", resetSelections);
+  // Fetch booked seats after rendering
+  await fetchBookedSeats(formattedDate);
 
-  // Reset function
+  // Reset all selections when date is changed
+  datePicker.addEventListener("change", () => {
+    fetchBookedSeats(datePicker.value);
+  });
+
   function resetSelections() {
     planDropdown.value = "";
     timeSlotDropdown.innerHTML =
@@ -88,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
     priceDisplay.innerHTML = "Price: <span>₹0</span>";
   }
 
-  // Populate time slots based on selected plan
   planDropdown.addEventListener("change", () => {
     const selectedPlan = planDropdown.value;
     timeSlotDropdown.innerHTML =
@@ -105,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Update price when selecting a time slot
   timeSlotDropdown.addEventListener("change", () => {
     const selectedOption =
       timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
@@ -113,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
     priceDisplay.innerHTML = `Price: <span>₹${price}</span>`;
   });
 
-  // Show notification
   function showNotification(message, type = "success") {
     notificationMessage.textContent = message;
     notification.style.backgroundColor =
@@ -125,8 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   }
 
-  // Confirm Booking
-  confirmBookingBtn.addEventListener("click", () => {
+  confirmBookingBtn.addEventListener("click", async () => {
     if (!selectedSeat) {
       showNotification("Please select a seat first!", "error");
       return;
@@ -137,21 +164,37 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    showNotification(
-      `Seat ${selectedSeat.textContent} booked for ${timeSlotDropdown.value}!`
-    );
+    const seatNumber = selectedSeat.dataset.seat;
+    const date = datePicker.value;
+    const timeSlot = timeSlotDropdown.value;
+    const plan = planDropdown.value;
+    const selectedOption =
+      timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
+    const price = selectedOption.dataset.price;
 
-    // Mark seat as booked
-    selectedSeat.classList.add("booked");
-    selectedSeat.classList.remove("selected");
-    selectedSeat = null;
 
-    // Reset selections for the next booking
-    resetSelections();
-    timeSelection.style.display = "none";
+
+    try {
+      const response = await fetch(`${API_URL}/bookings/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seatNumber, date, timeSlot, plan, price }),
+      });
+
+      if (!response.ok) throw new Error("Failed to book the seat.");
+
+      showNotification(`Seat ${seatNumber} booked for ${timeSlot}!`);
+      selectedSeat.classList.add("booked");
+      selectedSeat.classList.remove("selected");
+      selectedSeat = null;
+
+      resetSelections();
+      timeSelection.style.display = "none";
+    } catch (error) {
+      showNotification("Booking failed. Please try again.", "error");
+    }
   });
 
-  // Back to home button
   backHomeBtn.addEventListener("click", () => {
     showNotification("Returning to home page...");
     window.location.href = "index2.html";
