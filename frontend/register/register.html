@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register & Login | Wisdom Self-Study Centre</title>
+    <link rel="stylesheet" href="/frontend/css/style.css" />
+  </head>
+  <body>
+    <div class="back-home">
+      <a href="/frontend/home/index2.html">Back to Home</a>
+    </div>
+
+    <div class="main-container">
+      <div class="form-header">
+        <h1 id="formTitle">Register</h1>
+        <p id="formDescription">
+          Fill out the details below to create your account.
+        </p>
+      </div>
+
+      <form id="authForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstname">First Name <span>*</span></label>
+            <input type="text" id="firstname" name="firstname" required />
+          </div>
+          <div class="form-group">
+            <label for="lastname">Last Name <span>*</span></label>
+            <input type="text" id="lastname" name="lastname" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="age">Age <span>*</span></label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              required
+              min="15"
+              max="70"
+            />
+          </div>
+          <div class="form-group">
+            <label for="gender">Gender <span>*</span></label>
+            <select id="gender" name="gender" required>
+              <option value="" disabled selected>Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Others</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mobileno">Phone Number <span>*</span></label>
+            <input
+              type="tel"
+              id="mobileno"
+              name="mobileno"
+              pattern="[0-9]{10}"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="email">Email <span>*</span></label>
+            <input type="email" id="email" name="email" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password <span>*</span></label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <div class="form-group" id="confirmPasswordField">
+          <label for="confirmPassword">Confirm Password <span>*</span></label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            required
+          />
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" id="submitButton">Register</button>
+          <p id="toggleForm">
+            Already have an account?
+            <a href="../login/login.html" onclick="toggleForm()">Login</a>
+          </p>
+        </div>
+      </form>
+    </div>
+    <script src="../js/script.js"></script>
+  </body>
+</html>
