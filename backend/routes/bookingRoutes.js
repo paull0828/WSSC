@@ -18,6 +18,7 @@ router.get("/:date", async (req, res) => {
     const { date } = req.params;
     const bookings = await Booking.find({ date });
     console.log("Found bookings:", bookings);
+    
     res.json(bookings);
   } catch (error) {
     console.error("Error fetching bookings:", error);
