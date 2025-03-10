@@ -100,11 +100,45 @@ router.post("/login", async (req, res) => {
 
     console.log("✅ User Logged In:", user);
 
-    res.status(200).json({ message: "Login successful!", token, user });
+    res.cookie("token", token, {
+      httpOnly: true, // Prevents client-side JavaScript access
+      secure: process.env.NODE_ENV === "production", // Secure in production
+      sameSite: "Strict", // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/"
+    });
+
+    res.status(200).json({ message: "Login successful!",  user });
   } catch (error) {
     console.error("❌ Server Error:", error);
     res.status(500).json({ error: "Internal Server Error." });
   }
 });
+
+router.get("/me", async (req, res) => {
+  try {
+    const token = req.cookies.token; // Get JWT token from cookies
+
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret");
+
+    // Find user by ID
+    const user = await User.findById(decoded.userId).select("firstname lastname email");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("❌ Error fetching user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 module.exports = router;

@@ -440,72 +440,120 @@
       </div>
     </footer>
     <script>
-      // Mobile Menu Toggle
-      document.getElementById('menuToggle').addEventListener('click', function() {
-        document.getElementById('navMenu').classList.toggle('active');
-        this.classList.toggle('active');
+      document.addEventListener("DOMContentLoaded", async function () {
+        const userDisplay = document.getElementById("userDisplay");
+        const loginBtn = document.querySelector(".login-btn");
+        const logoutBtn = document.getElementById("logoutButton");
+
+        try {
+          const response = await fetch("http://localhost:5000/api/me", {
+            method: "GET",
+            credentials: "include", // Required to send cookies
+          });
+
+          if (!response.ok) {
+            throw new Error("Not logged in");
+          }
+
+          const data = await response.json();
+          if (data.user) {
+            userDisplay.innerHTML = `<span class="welcome-text">Welcome, ${data.user.firstname}!</span>`;
+            loginBtn.style.display = "none"; // Hide Login button
+            logoutBtn.style.display = "block"; // Show Logout button
+          }
+        } catch (error) {
+          console.log("User not logged in.");
+          userDisplay.innerHTML = ""; // Clear any text
+          loginBtn.style.display = "block"; // Show Login button
+          logoutBtn.style.display = "none"; // Hide Logout button
+        }
+
+        // Logout functionality
+        logoutBtn.addEventListener("click", async function () {
+          try {
+            await fetch("http://localhost:5000/api/logout", {
+              method: "POST",
+              credentials: "include",
+            });
+
+            document.cookie =
+              "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.reload(); // Refresh page
+          } catch (error) {
+            console.error("Logout failed", error);
+          }
+        });
       });
-  
+
+      // Mobile Menu Toggle
+      document
+        .getElementById("menuToggle")
+        .addEventListener("click", function () {
+          document.getElementById("navMenu").classList.toggle("active");
+          this.classList.toggle("active");
+        });
+
       // Smooth Scrolling
-      document.querySelectorAll('nav ul li a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-          if (this.hash !== '') {
+      document.querySelectorAll("nav ul li a").forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          if (this.hash !== "") {
             e.preventDefault();
             const target = document.querySelector(this.hash);
             window.scrollTo({
               top: target.offsetTop - 70,
-              behavior: 'smooth'
+              behavior: "smooth",
             });
             // Close mobile menu after clicking
-            document.getElementById('navMenu').classList.remove('active');
-            document.getElementById('menuToggle').classList.remove('active');
+            document.getElementById("navMenu").classList.remove("active");
+            document.getElementById("menuToggle").classList.remove("active");
           }
         });
       });
-  
+
       // FAQ Toggles
-      document.querySelectorAll('.faq-question').forEach(question => {
-        question.addEventListener('click', () => {
+      document.querySelectorAll(".faq-question").forEach((question) => {
+        question.addEventListener("click", () => {
           const faqItem = question.parentElement;
-          faqItem.classList.toggle('active');
-          
+          faqItem.classList.toggle("active");
+
           // Update the toggle symbol
-          const toggle = question.querySelector('.faq-toggle');
-          toggle.textContent = faqItem.classList.contains('active') ? '−' : '+';
+          const toggle = question.querySelector(".faq-toggle");
+          toggle.textContent = faqItem.classList.contains("active") ? "−" : "+";
         });
       });
-  
+
       // Simple Testimonial Slider
-      const dots = document.querySelectorAll('.testimonial-dots .dot');
+      const dots = document.querySelectorAll(".testimonial-dots .dot");
       dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
+        dot.addEventListener("click", () => {
           // Remove active class from all dots
-          dots.forEach(d => d.classList.remove('active'));
+          dots.forEach((d) => d.classList.remove("active"));
           // Add active class to clicked dot
-          dot.classList.add('active');
-          
+          dot.classList.add("active");
+
           // Calculate the translation value
-          const translateValue = -index * 100 + '%';
-          document.querySelector('.testimonial-slider').style.transform = 'translateX(' + translateValue + ')';
+          const translateValue = -index * 100 + "%";
+          document.querySelector(".testimonial-slider").style.transform =
+            "translateX(" + translateValue + ")";
         });
       });
-  
+
       // Check for logged in user
-      window.addEventListener('DOMContentLoaded', () => {
-        const userDisplay = document.getElementById('userDisplay');
-        const logoutButton = document.getElementById('logoutButton');
-        const loginButton = document.querySelector('.login-btn');
-        
+      window.addEventListener("DOMContentLoaded", () => {
+        const userDisplay = document.getElementById("userDisplay");
+        const logoutButton = document.getElementById("logoutButton");
+        const loginButton = document.querySelector(".login-btn");
+
         // This is a placeholder - replace with your actual authentication logic
-        const user = localStorage.getItem('user');
-        
+        const user = localStorage.getItem("user");
+
         if (user) {
-          userDisplay.textContent = 'Welcome, ' + user;
-          logoutButton.style.display = 'block';
-          loginButton.style.display = 'none';
+          userDisplay.textContent = "Welcome, " + user;
+          logoutButton.style.display = "block";
+          loginButton.style.display = "none";
         } else {
-          logoutButton.style.display = 'none';
-          loginButton.style.display = 'block';
+          logoutButton.style.display = "none";
+          loginButton.style.display = "block";
         }
       });
     </script>
