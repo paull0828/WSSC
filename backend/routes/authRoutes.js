@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const Booking = require("../models/booking");
 require("dotenv").config();
 
 const router = express.Router();
@@ -105,10 +106,10 @@ router.post("/login", async (req, res) => {
       secure: process.env.NODE_ENV === "production", // Secure in production
       sameSite: "Strict", // CSRF protection
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: "/"
+      path: "/",
     });
 
-    res.status(200).json({ message: "Login successful!",  user });
+    res.status(200).json({ message: "Login successful!", user });
   } catch (error) {
     console.error("❌ Server Error:", error);
     res.status(500).json({ error: "Internal Server Error." });
@@ -124,10 +125,15 @@ router.get("/me", async (req, res) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret");
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your_jwt_secret"
+    );
 
     // Find user by ID
-    const user = await User.findById(decoded.userId).select("firstname lastname email");
+    const user = await User.findById(decoded.userId).select(
+      "firstname lastname email"
+    );
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -140,5 +146,20 @@ router.get("/me", async (req, res) => {
   }
 });
 
+const authenticateUser = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized. Please log in." });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.id;
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired token. Please log in again." });
+  }
+};
 
 module.exports = router;
