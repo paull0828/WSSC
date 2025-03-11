@@ -1,186 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register | Wisdom Self-Study Centre</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/style.css" />
-</head>
-<body>
-  <div class="back-home">
-    <a href="/frontend/home/index2.html">
-      <span class="back-icon">←</span> Back to Home
-    </a>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | Wisdom Self-Study Centre</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <div class="back-home">
+      <a href="/frontend/home/index2.html">
+        <span class="back-icon">←</span> Back to Home
+      </a>
+    </div>
 
-  <div class="auth-container">
-    <div class="auth-wrapper signup-wrapper">
-      <div class="auth-visual">
-        <div class="logo-container">
-          <img src="../home/logo-removebg-preview.png" alt="Wisdom Self-Study Centre Logo" class="logo" />
-          <h2>Wisdom Self-Study Centre</h2>
+    <div class="auth-container">
+      <div class="auth-wrapper signup-wrapper">
+        <div class="auth-visual">
+          <div class="logo-container">
+            <img
+              src="../home/logo-removebg-preview.png"
+              alt="Wisdom Self-Study Centre Logo"
+              class="logo" />
+            <h2>Wisdom Self-Study Centre</h2>
+          </div>
+          <div class="illustration">
+            <img
+              src="/placeholder.svg?height=300&width=300"
+              alt="Study illustration" />
+          </div>
+          <div class="visual-text">
+            <h3>Join Our Community</h3>
+            <p>Create your account and start your focused study journey.</p>
+          </div>
         </div>
-        <div class="illustration">
-          <img src="/placeholder.svg?height=300&width=300" alt="Study illustration" />
+
+        <div class="auth-form">
+          <div class="form-header">
+            <h1 id="formTitle">Create Account</h1>
+            <p id="formDescription">
+              Fill out the details below to get started
+            </p>
+          </div>
+
+          <form id="authForm">
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="firstname"
+                  >First Name <span class="required">*</span></label
+                >
+                <div class="input-container">
+                  <span class="input-icon">👤</span>
+                  <input
+                    type="text"
+                    id="firstname"
+                    name="firstname"
+                    placeholder="First name"
+                    required />
+                </div>
+              </div>
+
+              <div class="form-group half">
+                <label for="lastname"
+                  >Last Name <span class="required">*</span></label
+                >
+                <div class="input-container">
+                  <span class="input-icon">👤</span>
+                  <input
+                    type="text"
+                    id="lastname"
+                    name="lastname"
+                    placeholder="Last name"
+                    required />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="age">Age <span class="required">*</span></label>
+                <div class="input-container">
+                  <span class="input-icon">🔢</span>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    placeholder="Your age"
+                    min="15"
+                    max="70"
+                    required />
+                </div>
+              </div>
+
+              <div class="form-group half">
+                <label for="gender"
+                  >Gender <span class="required">*</span></label
+                >
+                <div class="input-container select-container">
+                  <span class="input-icon">⚧️</span>
+                  <select id="gender" name="gender" required>
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Others</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="mobileno"
+                  >Phone Number <span class="required">*</span></label
+                >
+                <div class="input-container">
+                  <span class="input-icon">📱</span>
+                  <input
+                    type="tel"
+                    id="mobileno"
+                    name="mobileno"
+                    pattern="[0-9]{10}"
+                    placeholder="10-digit number"
+                    required />
+                </div>
+              </div>
+
+              <div class="form-group half">
+                <label for="email">Email <span class="required">*</span></label>
+                <div class="input-container">
+                  <span class="input-icon">✉️</span>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="your@email.com"
+                    required />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password"
+                >Password <span class="required">*</span></label
+              >
+              <div class="input-container">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Create a password"
+                  required />
+              </div>
+            </div>
+
+            <div class="form-group" id="confirmPasswordField">
+              <label for="confirmPassword"
+                >Confirm Password <span class="required">*</span></label
+              >
+              <div class="input-container">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  required />
+              </div>
+            </div>
+
+            <div class="form-options">
+              <div class="remember-me">
+                <input type="checkbox" id="terms" name="terms" required />
+                <label for="terms"
+                  >I agree to the <a href="#">Terms & Conditions</a></label
+                >
+              </div>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <button type="submit" id="submitButton" class="auth-button">
+              Create Account
+            </button>
+
+            <div class="form-footer">
+              <p id="toggleForm">
+                Already have an account? <a href="../login/login.html">Login</a>
+              </p>
+            </div>
+          </form>
         </div>
-        <div class="visual-text">
-          <h3>Join Our Community</h3>
-          <p>Create your account and start your focused study journey.</p>
-        </div>
-      </div>
-      
-      <div class="auth-form">
-        <div class="form-header">
-          <h1 id="formTitle">Create Account</h1>
-          <p id="formDescription">Fill out the details below to get started</p>
-        </div>
-        
-        <form id="authForm">
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="firstname">First Name <span class="required">*</span></label>
-              <div class="input-container">
-                <span class="input-icon">👤</span>
-                <input type="text" id="firstname" name="firstname" placeholder="First name" required />
-              </div>
-            </div>
-            
-            <div class="form-group half">
-              <label for="lastname">Last Name <span class="required">*</span></label>
-              <div class="input-container">
-                <span class="input-icon">👤</span>
-                <input type="text" id="lastname" name="lastname" placeholder="Last name" required />
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="age">Age <span class="required">*</span></label>
-              <div class="input-container">
-                <span class="input-icon">🔢</span>
-                <input type="number" id="age" name="age" placeholder="Your age" min="15" max="70" required />
-              </div>
-            </div>
-            
-            <div class="form-group half">
-              <label for="gender">Gender <span class="required">*</span></label>
-              <div class="input-container select-container">
-                <span class="input-icon">⚧️</span>
-                <select id="gender" name="gender" required>
-                  <option value="" disabled selected>Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Others</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="mobileno">Phone Number <span class="required">*</span></label>
-              <div class="input-container">
-                <span class="input-icon">📱</span>
-                <input type="tel" id="mobileno" name="mobileno" pattern="[0-9]{10}" placeholder="10-digit number" required />
-              </div>
-            </div>
-            
-            <div class="form-group half">
-              <label for="email">Email <span class="required">*</span></label>
-              <div class="input-container">
-                <span class="input-icon">✉️</span>
-                <input type="email" id="email" name="email" placeholder="your@email.com" required />
-              </div>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="password">Password <span class="required">*</span></label>
-            <div class="input-container">
-              <span class="input-icon">🔒</span>
-              <input type="password" id="password" name="password" placeholder="Create a password" required />
-            </div>
-          </div>
-          
-          <div class="form-group" id="confirmPasswordField">
-            <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
-            <div class="input-container">
-              <span class="input-icon">🔒</span>
-              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required />
-            </div>
-          </div>
-          
-          <div class="form-options">
-            <div class="remember-me">
-              <input type="checkbox" id="terms" name="terms" required />
-              <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
-            </div>
-          </div>
-          
-          <div id="errorMessage" class="error-message"></div>
-          
-          <button type="submit" id="submitButton" class="auth-button">Create Account</button>
-          
-          <div class="form-footer">
-            <p id="toggleForm">Already have an account? <a href="../login/login.html">Login</a></p>
-          </div>
-        </form>
       </div>
     </div>
-  </div>
-  
-  <script>
-    document.getElementById("authForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
 
-      const password = document.getElementById("password").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-      const errorMessage = document.getElementById("errorMessage");
+    <script>
+      document
+        .getElementById("authForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-      if (password !== confirmPassword) {
-        errorMessage.textContent = "Passwords do not match!";
-        return;
-      }
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+          const errorMessage = document.getElementById("errorMessage");
 
-      const formData = {
-        firstname: document.getElementById("firstname").value,
-        lastname: document.getElementById("lastname").value,
-        age: document.getElementById("age").value,
-        gender: document.getElementById("gender").value,
-        mobileno: document.getElementById("mobileno").value,
-        email: document.getElementById("email").value,
-        password,
-        confirmPassword,
-      };
+          if (password !== confirmPassword) {
+            errorMessage.textContent = "Passwords do not match!";
+            return;
+          }
 
-      console.log("📤 Sending Data:", formData);
+          const formData = {
+            firstname: document.getElementById("firstname").value,
+            lastname: document.getElementById("lastname").value,
+            age: document.getElementById("age").value,
+            gender: document.getElementById("gender").value,
+            mobileno: document.getElementById("mobileno").value,
+            email: document.getElementById("email").value,
+            password,
+            confirmPassword,
+          };
 
-      try {
-        const response = await fetch("http://localhost:5000/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          console.log("📤 Sending Data:", formData);
+
+          try {
+            const response = await fetch("http://localhost:4000/api/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+
+            const result = await response.json();
+            console.log("📩 Response Received:", result);
+
+            if (response.ok) {
+              localStorage.setItem("userName", formData.firstname);
+              alert(result.message);
+              document.getElementById("authForm").reset();
+              window.location.replace("../login/login.html");
+            } else {
+              errorMessage.textContent = result.error || "Registration failed";
+            }
+          } catch (error) {
+            console.error("❌ Error:", error);
+            errorMessage.textContent = "An error occurred. Please try again.";
+          }
         });
-
-        const result = await response.json();
-        console.log("📩 Response Received:", result);
-
-        if (response.ok) {
-          localStorage.setItem("userName", formData.firstname);
-          alert(result.message);
-          document.getElementById("authForm").reset();
-          window.location.replace("../login/login.html");
-        } else {
-          errorMessage.textContent = result.error || "Registration failed";
-        }
-      } catch (error) {
-        console.error("❌ Error:", error);
-        errorMessage.textContent = "An error occurred. Please try again.";
-      }
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>
-

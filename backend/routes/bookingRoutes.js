@@ -28,7 +28,7 @@ router.get("/:date", async (req, res) => {
 });
 
 // Create a new booking
-router.post("/book-seat", authenticateUser, async (req, res) => {
+router.post("/book-seat",  async (req, res) => {
   const { seatNumber, timeSlot } = req.body;
   try {
     const existingBooking = await Booking.findOne({ seatNumber, timeSlot });

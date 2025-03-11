@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedSeat = null;
 
   // Backend API URL
-  const API_URL = "http://localhost:5000"; // Change as needed
+  const API_URL = "http://localhost:4000"; // Change as needed
 
   // Set minimum date to today
   const today = new Date();
@@ -42,8 +42,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Error fetching booked seats:", error);
       // For demo purposes, simulate some booked seats if API fails
-      const randomSeats = Array.from({length: 10}, () => Math.floor(Math.random() * 40) + 1);
-      randomSeats.forEach(seatNumber => {
+      const randomSeats = Array.from(
+        { length: 10 },
+        () => Math.floor(Math.random() * 40) + 1
+      );
+      randomSeats.forEach((seatNumber) => {
         const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
         if (seat) seat.classList.add("booked");
       });
@@ -84,7 +87,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   for (let row = 1; row <= 5; row++) {
     for (let col = 1; col <= 8; col++) {
       const seatNumber = (row - 1) * 8 + col;
-      
+
       const seat = document.createElement("div");
       seat.classList.add("seat");
       seat.textContent = seatNumber;
@@ -109,7 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         resetSelections();
         timeSelection.style.display = "block";
-        
+
         // Add a subtle animation to highlight the booking section
         timeSelection.classList.add("booking-highlight");
       });
@@ -154,13 +157,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
     const price = selectedOption.dataset.price;
     priceDisplay.innerHTML = `Price: <span>₹${price}</span>`;
-    
+
     // Animate the price change
-    const priceSpan = priceDisplay.querySelector('span');
-    priceSpan.style.transition = 'all 0.3s ease';
-    priceSpan.style.transform = 'scale(1.1)';
+    const priceSpan = priceDisplay.querySelector("span");
+    priceSpan.style.transition = "all 0.3s ease";
+    priceSpan.style.transform = "scale(1.1)";
     setTimeout(() => {
-      priceSpan.style.transform = 'scale(1)';
+      priceSpan.style.transform = "scale(1)";
     }, 300);
   });
 
@@ -212,7 +215,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
 
       // Simulate API delay for demo purposes
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       if (!response.ok) throw new Error("Failed to book the seat.");
 
@@ -225,7 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       timeSelection.style.display = "none";
     } catch (error) {
       console.error("Booking error:", error);
-      
+
       // For demo purposes, simulate successful booking
       showNotification(`Seat ${seatNumber} booked for ${timeSlot}!`);
       selectedSeat.classList.add("booked");
