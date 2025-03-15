@@ -1,15 +1,38 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
-const Booking = require("../models/booking");
-require("dotenv").config();
-
+import express from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/user.js";
 const router = express.Router();
+import dotenv from "dotenv";
 
+dotenv.config();
+
+// Middleware for authentication
+const authenticateUser = (req, res, next) => {
+  const token = req.cookies.token; // Get JWT token from cookies
+
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your_jwt_secret"
+    );
+    req.user = decoded; // Attach user data to request
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .json({ error: "Invalid or expired token. Please log in again." });
+  }
+};
+
+// ✅ **Register Route**
 router.post("/register", async (req, res) => {
   try {
-    console.log("📥 Received Data:", req.body);
+    console.log("📥 Registration Request:", req.body);
 
     const {
       firstname,
@@ -35,7 +58,6 @@ router.post("/register", async (req, res) => {
     ) {
       return res.status(400).json({ error: "All fields are required." });
     }
-
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match!" });
     }
@@ -45,7 +67,7 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Email already registered." });
     }
 
-    // Hash password before saving
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -55,26 +77,25 @@ router.post("/register", async (req, res) => {
       gender,
       mobileno,
       email,
-      password: hashedPassword, // Store hashed password
+      password: hashedPassword,
     });
-
     await newUser.save();
-    console.log("✅ User Registered:", newUser);
 
+    console.log("✅ User Registered:", newUser);
     res.status(201).json({ message: "User registered successfully!" });
   } catch (error) {
-    console.error("❌ Server Error:", error);
+    console.error("❌ Registration Error:", error);
     res.status(500).json({ error: "Internal Server Error." });
   }
 });
 
+// ✅ **Login Route**
 router.post("/login", async (req, res) => {
   try {
-    console.log("📥 Login Request Received:", req.body);
+    console.log("📥 Login Request:", req.body);
 
     const { email, password } = req.body;
 
-    // Validation
     if (!email || !password) {
       return res
         .status(400)
@@ -86,7 +107,6 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password." });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "Invalid email or password." });
@@ -102,64 +122,37 @@ router.post("/login", async (req, res) => {
     console.log("✅ User Logged In:", user);
 
     res.cookie("token", token, {
-      httpOnly: true, // Prevents client-side JavaScript access
-      secure: process.env.NODE_ENV === "production", // Secure in production
-      sameSite: "Strict", // CSRF protection
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: "/",
     });
 
     res.status(200).json({ message: "Login successful!", user });
   } catch (error) {
-    console.error("❌ Server Error:", error);
+    console.error("❌ Login Error:", error);
     res.status(500).json({ error: "Internal Server Error." });
   }
 });
 
-router.get("/me", async (req, res) => {
+// ✅ **Get Logged-in User Data**
+router.get("/me", authenticateUser, async (req, res) => {
   try {
-    const token = req.cookies.token; // Get JWT token from cookies
-
-    if (!token) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your_jwt_secret"
-    );
-
-    // Find user by ID
-    const user = await User.findById(decoded.userId).select(
-      "firstname lastname email"
-    );
-
+    const user = await User.findOne({ email: req.user.email });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    res.json({ user });
+    res.json({ user, userEmail: req.user.email });
   } catch (error) {
     console.error("❌ Error fetching user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error." });
   }
 });
 
-const authenticateUser = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) {
-    return res.status(401).json({ message: "Unauthorized. Please log in." });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id;
-    next();
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ message: "Invalid or expired token. Please log in again." });
-  }
-};
+// ✅ **Logout Route**
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", { path: "/" });
+  res.status(200).json({ message: "Logged out successfully!" });
+});
 
-module.exports = router;
+export default router;

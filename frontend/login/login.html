@@ -6,7 +6,8 @@
     <title>Login | Wisdom Self-Study Centre</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet" />
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body>
@@ -23,13 +24,15 @@
             <img
               src="../home/logo-removebg-preview.png"
               alt="Wisdom Self-Study Centre Logo"
-              class="logo" />
+              class="logo"
+            />
             <h2>Wisdom Self-Study Centre</h2>
           </div>
           <div class="illustration">
             <img
               src="/placeholder.svg?height=300&width=300"
-              alt="Study illustration" />
+              alt="Study illustration"
+            />
           </div>
           <div class="visual-text">
             <h3>Focus Better. Study Smarter.</h3>
@@ -55,7 +58,8 @@
                   id="email"
                   name="email"
                   placeholder="your@email.com"
-                  required />
+                  required
+                />
               </div>
             </div>
 
@@ -70,7 +74,8 @@
                   id="password"
                   name="password"
                   placeholder="Your password"
-                  required />
+                  required
+                />
               </div>
             </div>
 
@@ -118,6 +123,8 @@
           const data = await response.json();
 
           if (response.ok) {
+            // Store email in localStorage
+            localStorage.setItem("userEmail", email);
             // Redirect to homepage after login
             window.location.replace("/frontend/home/index2.html");
           } else {

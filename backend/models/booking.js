@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema({
   seatNumber: { type: Number, required: true },
@@ -7,7 +7,6 @@ const bookingSchema = new mongoose.Schema({
   timeSlot: { type: String, required: true },
   price: { type: Number, required: true },
   status: { type: String, default: "booked" },
-
 });
 
-module.exports = mongoose.model("Booking", bookingSchema);
+export default mongoose.model("Booking", bookingSchema);

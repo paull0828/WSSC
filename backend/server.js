@@ -1,23 +1,43 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
-const bookingRoutes = require("./routes/bookingRoutes");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import dotenv from "dotenv";
 
+dotenv.config();
+
+// Initialize Express App
 const app = express();
+
+// Connect to MongoDB
 connectDB();
 
+// ✅ Middleware Configuration
+app.use(bodyParser.json());
+app.use(cookieParser()); // ✅ Enables parsing of cookies
+
+// ✅ CORS Configuration (Handles Frontend Communication)
 app.use(
   cors({
-    origin: "http://127.0.0.1:5501", // Allow only this origin
-    credentials: true, // Allow credentials (cookies, authorization headers)
+    origin: "http://127.0.0.1:5501", // ✅ Allow frontend origin
+    credentials: true, // ✅ Allow cookies & authorization headers
+    methods: ["GET", "POST", "PUT", "DELETE"], // ✅ Allowed HTTP methods
   })
 );
-app.use(bodyParser.json());
+
+// ✅ Routes
 app.use("/api", authRoutes);
 app.use("/bookings", bookingRoutes);
 
+// ✅ Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error("❌ Server Error:", err.message);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+// ✅ Start Server
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

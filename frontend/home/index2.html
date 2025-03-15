@@ -7,7 +7,8 @@
     <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet" />
+      rel="stylesheet"
+    />
     <!-- External CSS -->
     <link rel="stylesheet" href="style2.css" />
   </head>
@@ -19,7 +20,8 @@
           <img
             src="../home/logo-removebg-preview.png"
             alt="Wisdom Self-Study Centre Logo"
-            class="logo" />
+            class="logo"
+          />
           <span class="site-name">Wisdom Self-Study Centre</span>
         </div>
         <nav>
@@ -44,6 +46,13 @@
             </li>
           </ul>
         </nav>
+        <div id="logoutConfirm" class="logout-confirm">
+          <div class="logout-confirm-content">
+            <p>Are you sure you want to logout?</p>
+            <button id="confirmLogout" class="confirm-btn">Yes</button>
+            <button id="cancelLogout" class="cancel-btn">No</button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -61,7 +70,8 @@
         <div class="hero-image">
           <img
             src="/placeholder.svg?height=400&width=500"
-            alt="Students studying in a peaceful environment" />
+            alt="Students studying in a peaceful environment"
+          />
         </div>
       </div>
     </section>
@@ -261,7 +271,8 @@
             <div class="testimonial-image">
               <img
                 src="/placeholder.svg?height=100&width=100"
-                alt="Rahul Sharma" />
+                alt="Rahul Sharma"
+              />
             </div>
             <div class="testimonial-content">
               <p>
@@ -280,7 +291,8 @@
             <div class="testimonial-image">
               <img
                 src="/placeholder.svg?height=100&width=100"
-                alt="Priya Mehta" />
+                alt="Priya Mehta"
+              />
             </div>
             <div class="testimonial-content">
               <p>
@@ -299,7 +311,8 @@
             <div class="testimonial-image">
               <img
                 src="/placeholder.svg?height=100&width=100"
-                alt="Amit Patel" />
+                alt="Amit Patel"
+              />
             </div>
             <div class="testimonial-content">
               <p>
@@ -383,7 +396,8 @@
                   id="message"
                   name="message"
                   rows="5"
-                  required></textarea>
+                  required
+                ></textarea>
               </div>
               <button type="submit" class="submit-btn">Send Message</button>
             </form>
@@ -400,7 +414,8 @@
             <img
               src="../home/logo-removebg-preview.png"
               alt="Wisdom Self-Study Centre Logo"
-              class="footer-logo" />
+              class="footer-logo"
+            />
             <h3>Wisdom Self-Study Centre</h3>
             <p>
               Creating the perfect environment for focused learning and academic
@@ -444,44 +459,59 @@
         const userDisplay = document.getElementById("userDisplay");
         const loginBtn = document.querySelector(".login-btn");
         const logoutBtn = document.getElementById("logoutButton");
+        const logoutConfirm = document.getElementById("logoutConfirm");
+        const confirmLogout = document.getElementById("confirmLogout");
+        const cancelLogout = document.getElementById("cancelLogout");
+        const userEmail = localStorage.getItem("userEmail");
 
-        try {
-          const response = await fetch("http://localhost:4000/api/me", {
-            method: "GET",
-            credentials: "include", // Required to send cookies
-          });
+        if (userEmail) {
+          try {
+            const response = await fetch("http://localhost:4000/api/me", {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userEmail}`,
+              },
+            });
+            if (!response.ok) {
+              throw new Error("Not logged in");
+            }
 
-          if (!response.ok) {
-            throw new Error("Not logged in");
+            const data = await response.json();
+            localStorage.setItem("userName", data.user.firstname);
+            if (data.user) {
+              userDisplay.innerHTML = `<span class="welcome-text">Welcome, ${data.user.firstname}!</span>`;
+              loginBtn.style.display = "none"; // Hide Login button
+              logoutBtn.style.display = "block"; // Show Logout button
+            }
+          } catch (error) {
+            console.log("User not logged in.");
+            userDisplay.innerHTML = ""; // Clear any text
+            loginBtn.style.display = "block"; // Show Login button
+            logoutBtn.style.display = "none"; // Hide Logout button
           }
-
-          const data = await response.json();
-          if (data.user) {
-            userDisplay.innerHTML = `<span class="welcome-text">Welcome, ${data.user.firstname}!</span>`;
-            loginBtn.style.display = "none"; // Hide Login button
-            logoutBtn.style.display = "block"; // Show Logout button
-          }
-        } catch (error) {
-          console.log("User not logged in.");
+        } else {
           userDisplay.innerHTML = ""; // Clear any text
           loginBtn.style.display = "block"; // Show Login button
           logoutBtn.style.display = "none"; // Hide Logout button
         }
 
-        // Logout functionality
-        logoutBtn.addEventListener("click", async function () {
-          try {
-            await fetch("http://localhost:4000/api/logout", {
-              method: "POST",
-              credentials: "include",
-            });
+        // Show logout confirmation dialog
+        logoutConfirm.hidden = true;
+        logoutBtn.addEventListener("click", function () {
+          logoutConfirm.classList.add("show");
+        });
 
-            document.cookie =
-              "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.reload(); // Refresh page
-          } catch (error) {
-            console.error("Logout failed", error);
-          }
+        // Confirm logout
+        confirmLogout.addEventListener("click", function () {
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userName");
+          window.location.reload(); // Refresh page
+        });
+
+        // Cancel logout
+        cancelLogout.addEventListener("click", function () {
+          logoutConfirm.classList.remove("show");
         });
       });
 
