@@ -40,6 +40,9 @@
               <button id="logoutButton" class="logout-btn">Logout</button>
             </li>
             <li>
+              <a href="../home/userProfile.html">UserProfile</a>
+            </li>
+            <li>
               <a href="../register/register.html" class="login-btn"
                 >Login/Sign Up</a
               >
@@ -470,7 +473,7 @@
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${userEmail}`,
+                "x-user-email": userEmail,
               },
             });
             if (!response.ok) {
@@ -478,7 +481,6 @@
             }
 
             const data = await response.json();
-            localStorage.setItem("userName", data.user.firstname);
             if (data.user) {
               userDisplay.innerHTML = `<span class="welcome-text">Welcome, ${data.user.firstname}!</span>`;
               loginBtn.style.display = "none"; // Hide Login button
@@ -499,7 +501,7 @@
         // Show logout confirmation dialog
         logoutConfirm.hidden = true;
         logoutBtn.addEventListener("click", function () {
-          logoutConfirm.classList.add("show");
+          logoutConfirm.hidden = false;
         });
 
         // Confirm logout
@@ -511,7 +513,7 @@
 
         // Cancel logout
         cancelLogout.addEventListener("click", function () {
-          logoutConfirm.classList.remove("show");
+          logoutConfirm.hidden = true;
         });
       });
 

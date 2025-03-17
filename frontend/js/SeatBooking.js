@@ -13,43 +13,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   let selectedSeat = null;
 
   // Backend API URL
-  const API_URL = "http://localhost:4000"; // Change as needed
+  const API_URL = "http://localhost:4000"; // Ensure this matches your backend route
 
-  // Set minimum date to today
-  const today = new Date();
-  const formattedDate = today.toISOString().split("T")[0];
-  datePicker.value = formattedDate;
-  datePicker.min = formattedDate;
-
-  // Fetch booked seats from backend
-  async function fetchBookedSeats(date) {
+  // Fetch available seats from backend
+  async function fetchAvailableSeats() {
     try {
-      const response = await fetch(`${API_URL}/bookings/${date}`);
+      const response = await fetch(`${API_URL}/bookings/available-seats`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-      const bookedSeats = await response.json();
-      console.log("Booked Seats:", bookedSeats);
+      const availableSeats = await response.json();
 
       document.querySelectorAll(".seat").forEach((seat) => {
         seat.classList.remove("booked", "selected");
+        seat.classList.add("available");
+        seat.disabled = false; // Enable all seats initially
       });
 
-      bookedSeats.forEach(({ seatNumber }) => {
+      availableSeats.forEach((seatNumber) => {
         const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
-        if (seat) seat.classList.add("booked");
+        if (seat) {
+          seat.classList.remove("available");
+          seat.classList.add("booked");
+          seat.disabled = true; // Disable booked seats
+        }
       });
     } catch (error) {
-      console.error("Error fetching booked seats:", error);
-      // For demo purposes, simulate some booked seats if API fails
-      const randomSeats = Array.from(
-        { length: 10 },
-        () => Math.floor(Math.random() * 40) + 1
-      );
-      randomSeats.forEach((seatNumber) => {
-        const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
-        if (seat) seat.classList.add("booked");
-      });
+      console.error("Error fetching available seats:", error);
     }
   }
 
@@ -121,13 +111,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Fetch booked seats after rendering
-  await fetchBookedSeats(formattedDate);
-
-  // Reset all selections when date is changed
-  datePicker.addEventListener("change", () => {
-    fetchBookedSeats(datePicker.value);
-  });
+  // Fetch available seats after rendering
+  await fetchAvailableSeats();
 
   function resetSelections() {
     planDropdown.value = "";
@@ -179,6 +164,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   confirmBookingBtn.addEventListener("click", async () => {
+    const email = localStorage.getItem("userEmail");
     if (!selectedSeat) {
       showNotification("Please select a seat first!", "error");
       return;
@@ -206,14 +192,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       </svg>
       Processing...
     `;
-
     try {
-      const response = await fetch(`${API_URL}/bookings/book`, {
+      const response = await fetch(`${API_URL}/bookings/book-seat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seatNumber, date, timeSlot, plan, price }),
+        body: JSON.stringify({
+          seatNumber,
+          email,
+          date,
+          timeSlot,
+          plan,
+          price,
+        }),
       });
-
       // Simulate API delay for demo purposes
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -229,14 +220,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Booking error:", error);
 
-      // For demo purposes, simulate successful booking
-      showNotification(`Seat ${seatNumber} booked for ${timeSlot}!`);
-      selectedSeat.classList.add("booked");
-      selectedSeat.classList.remove("selected");
-      selectedSeat = null;
-
-      resetSelections();
-      timeSelection.style.display = "none";
+      showNotification(`Failed to book seat: ${error.message}`, "error");
     } finally {
       // Reset button state
       confirmBookingBtn.disabled = false;

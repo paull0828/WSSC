@@ -1,0 +1,84 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Back to Home Link */
+.back-home {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background-color: rgb(203, 200, 200);
+}
+
+.back-home a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--background);
+  padding: 8px 15px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: var(--transition);
+  text-decoration: none;
+  color: black;
+}
+
+.back-home a:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.back-icon {
+  font-size: 1.2rem;
+}
+
+h1,
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+.profile-info {
+  margin-bottom: 20px;
+}
+
+.profile-info p {
+  font-size: 18px;
+  color: #555;
+}
+
+.bookings table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.bookings th,
+.bookings td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.bookings th {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.bookings tr:nth-child(even) {
+  background-color: #f9f9f9;
+}

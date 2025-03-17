@@ -2,32 +2,11 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-const router = express.Router();
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Middleware for authentication
-const authenticateUser = (req, res, next) => {
-  const token = req.cookies.token; // Get JWT token from cookies
-
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized. Please log in." });
-  }
-
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your_jwt_secret"
-    );
-    req.user = decoded; // Attach user data to request
-    next();
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ error: "Invalid or expired token. Please log in again." });
-  }
-};
+const router = express.Router();
 
 // ✅ **Register Route**
 router.post("/register", async (req, res) => {
@@ -114,21 +93,14 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { email: user.email },
       process.env.JWT_SECRET || "your_jwt_secret",
-      { expiresIn: "7d" }
+      { expiresIn: "1h" }
     );
 
     console.log("✅ User Logged In:", user);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    res.status(200).json({ message: "Login successful!", user });
+    res.status(200).json({ message: "Login successful!", user, token });
   } catch (error) {
     console.error("❌ Login Error:", error);
     res.status(500).json({ error: "Internal Server Error." });
@@ -136,13 +108,15 @@ router.post("/login", async (req, res) => {
 });
 
 // ✅ **Get Logged-in User Data**
-router.get("/me", authenticateUser, async (req, res) => {
+router.get("/me", async (req, res) => {
+  const email = req.headers["x-user-email"];
+  console.log("👤 Fetching User:", email);
   try {
-    const user = await User.findOne({ email: req.user.email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    res.json({ user, userEmail: req.user.email });
+    res.json({ user });
   } catch (error) {
     console.error("❌ Error fetching user:", error);
     res.status(500).json({ error: "Internal Server Error." });

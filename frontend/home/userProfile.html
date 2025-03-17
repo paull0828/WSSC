@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="./userStyle.css" />
+  </head>
+  <body>
+    <div class="back-home">
+      <a href="/frontend/home/index2.html">
+        <span class="back-icon">←</span> Back to Home
+      </a>
+    </div>
+    <div class="container">
+      <h1>User Profile</h1>
+      <div class="profile-info">
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+      </div>
+      <h2>Bookings</h2>
+      <div class="bookings">
+        <table>
+          <thead>
+            <tr>
+              <th>Seat Number</th>
+              <th>Date</th>
+              <th>Time Slot</th>
+              <th>Plan</th>
+              <th>Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-list">
+            <!-- Bookings will be dynamically inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script src="../js/userProfile.js"></script>
+  </body>
+</html>

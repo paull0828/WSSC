@@ -1,54 +1,23 @@
 import express from "express";
-const router = express.Router();
-//import { authenticateUser } from "./authRoutes"; // ✅ Import authentication
 import Booking from "../models/booking.js";
+import User from "../models/user.js";
 
-// ✅ Fetch all bookings (Admin or Dashboard Use)
-router.get("/book", async (req, res) => {
-  try {
-    const bookings = await Booking.find().populate(
-      "userId",
-      "firstname lastname email"
-    );
-    res.json(bookings);
-  } catch (error) {
-    console.error("❌ Error fetching all bookings:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// ✅ Fetch booked seats for a specific date
-router.get("/:date", async (req, res) => {
-  console.log("📅 Fetching bookings for date:", req.params.date);
-  try {
-    const { date } = req.params;
-    const bookings = await Booking.find({ date }).populate(
-      "userId",
-      "firstname lastname email"
-    );
-
-    console.log("✅ Found bookings:", bookings);
-    res.json(bookings);
-  } catch (error) {
-    console.error("❌ Error fetching bookings:", error);
-    res.status(500).json({ message: "Error fetching bookings" });
-  }
-});
+const router = express.Router();
 
 // ✅ Create a new booking (User must be logged in)
 router.post("/book-seat", async (req, res) => {
   try {
-    const { seatNumber, timeSlot, date } = req.body;
+    const { seatNumber, email, date, timeSlot, plan, price } = req.body;
 
-    if (!seatNumber || !timeSlot || !date) {
+    if (!seatNumber || !timeSlot || !date || !email) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
     // Check if the seat is already booked for the same time slot & date
     const existingBooking = await Booking.findOne({
       seatNumber,
-      timeSlot,
       date,
+      timeSlot,
     });
     if (existingBooking) {
       return res
@@ -58,13 +27,23 @@ router.post("/book-seat", async (req, res) => {
 
     // Create new booking
     const newBooking = new Booking({
-      userId: req.user.userId, // Get user ID from JWT
       seatNumber,
-      timeSlot,
+      email,
       date,
+      timeSlot,
+      plan,
+      price,
     });
 
     await newBooking.save();
+
+    // Find the user and update their bookings
+    const user = await User.findOne({ email });
+    if (user) {
+      user.bookings.push(newBooking);
+      await user.save();
+    }
+
     console.log("✅ Seat booked successfully:", newBooking);
     res.json({ message: "✅ Seat booked successfully!", booking: newBooking });
   } catch (error) {
@@ -73,27 +52,19 @@ router.post("/book-seat", async (req, res) => {
   }
 });
 
-// ✅ Delete a booking (Only Admin or User who booked can delete)
-router.delete("/:id", async (req, res) => {
+// ✅ Get all seats that are not booked
+router.get("/available-seats", async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
-
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found." });
-    }
-
-    // Check if the logged-in user is the owner of the booking
-    if (booking.userId.toString() !== req.user.userId) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to delete this booking." });
-    }
-
-    await Booking.findByIdAndDelete(req.params.id);
-    res.json({ message: "✅ Booking deleted successfully." });
+    const bookedSeats = await Booking.find({}, "seatNumber");
+    const bookedSeatNumbers = bookedSeats.map((booking) => booking.seatNumber);
+    const allSeats = Array.from({ length: 40 }, (_, i) => i + 1);
+    const availableSeats = allSeats.filter((seat) =>
+      bookedSeatNumbers.includes(seat)
+    );
+    res.json(availableSeats);
   } catch (error) {
-    console.error("❌ Deletion Error:", error);
-    res.status(500).json({ message: "Error deleting booking." });
+    console.error("❌ Error fetching available seats:", error);
+    res.status(500).json({ message: "Error fetching available seats." });
   }
 });
 

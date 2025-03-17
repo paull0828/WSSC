@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
+import userRoutes from "./routes/userRoute.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -31,6 +32,7 @@ app.use(
 // ✅ Routes
 app.use("/api", authRoutes);
 app.use("/bookings", bookingRoutes);
+app.use("/users", userRoutes);
 
 // ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
