@@ -53,14 +53,28 @@ router.post("/book-seat", async (req, res) => {
 });
 
 // ✅ Get all seats that are not booked
-router.get("/available-seats", async (req, res) => {
+router.post("/available-seats", async (req, res) => {
   try {
-    const bookedSeats = await Booking.find({}, "seatNumber");
+    const { date, timeSlot } = req.body;
+
+    if (!date || !timeSlot) {
+      return res
+        .status(400)
+        .json({ message: "Date and time slot are required." });
+    }
+
+    // Find all bookings for the given date and time slot
+    const bookedSeats = await Booking.find({ date, timeSlot }, "seatNumber");
     const bookedSeatNumbers = bookedSeats.map((booking) => booking.seatNumber);
+
+    // Generate all seat numbers (assuming 40 seats)
     const allSeats = Array.from({ length: 40 }, (_, i) => i + 1);
+
+    // Filter out booked seats
     const availableSeats = allSeats.filter((seat) =>
       bookedSeatNumbers.includes(seat)
     );
+
     res.json(availableSeats);
   } catch (error) {
     console.error("❌ Error fetching available seats:", error);
