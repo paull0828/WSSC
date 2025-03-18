@@ -16,13 +16,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   const API_URL = "http://localhost:4000"; // Ensure this matches your backend route
 
   // Fetch available seats from backend
-  async function fetchAvailableSeats() {
+  async function fetchAvailableSeats(date, timeSlot) {
     try {
-      const response = await fetch(`${API_URL}/bookings/available-seats`);
+      if (!date || !timeSlot) {
+        throw new Error("Date and time slot are required.");
+      }
+
+      const response = await fetch(`${API_URL}/bookings/available-seats`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ date, timeSlot }),
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const availableSeats = await response.json();
+      console.log("Available Seats:", availableSeats);
 
       document.querySelectorAll(".seat").forEach((seat) => {
         seat.classList.remove("booked", "selected");
@@ -112,7 +123,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Fetch available seats after rendering
-  await fetchAvailableSeats();
+  await fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+
+  // Reset all selections when date or time slot is changed
+  datePicker.addEventListener("change", () => {
+    fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+  });
+
+  timeSlotDropdown.addEventListener("change", () => {
+    fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+  });
 
   function resetSelections() {
     planDropdown.value = "";
@@ -182,6 +202,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const selectedOption =
       timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
     const price = selectedOption.dataset.price;
+
+    // Validate date
+    const selectedDate = new Date(date);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+
+    if (selectedDate < currentDate) {
+      showNotification("Cannot book a seat for a previous date!", "error");
+      return;
+    }
 
     // Add loading state to button
     confirmBookingBtn.disabled = true;
