@@ -395,123 +395,223 @@ nav {
   color: var(--text-light);
 }
 
-/* Plans Section */
-.plans {
-  padding: 5rem 0;
-  background-color: var(--background-alt);
-}
-
-.plans-wrapper {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.plan-card {
-  background-color: var(--background);
-  border-radius: var(--radius-lg);
-  padding: 2.5rem 2rem;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-  text-align: center;
-  border: 1px solid var(--border-color);
-}
-
-.plan-card.featured {
-  transform: scale(1.05);
-  border: 2px solid var(--primary-color);
-  z-index: 1;
-}
-
-.plan-card:hover {
-  transform: translateY(-10px);
-  box-shadow: var(--shadow-lg);
-}
-
-.plan-card.featured:hover {
-  transform: scale(1.05) translateY(-10px);
-}
-
-.plan-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: var(--accent-color);
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-bottom-left-radius: var(--radius-md);
-}
-
-.plan-card h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: var(--text-dark);
-}
-
-.plan-price {
-  margin-bottom: 2rem;
-}
-
-.plan-price .currency {
-  font-size: 1.5rem;
-  font-weight: 600;
-  vertical-align: top;
-  color: var(--text-dark);
-}
-
-.plan-price .amount {
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
-  line-height: 1;
-}
-
-.plan-price .period {
-  font-size: 1rem;
-  color: var(--text-light);
-}
-
-.plan-features {
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.plan-features li {
-  padding: 0.75rem 0;
-  color: var(--text-light);
-  border-bottom: 1px solid var(--border-color);
-  position: relative;
-  padding-left: 1.5rem;
-}
-
-.plan-features li::before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: var(--secondary-color);
-  font-weight: 600;
-}
-
-.plan-button {
-  display: inline-block;
-  background-color: var(--primary-color);
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
-  transition: var(--transition);
-}
-
-.plan-button:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-3px);
-}
+  /* Plans Section Styling */
+  .plans {
+    background-color: #f8f9fa;
+    padding: 80px 0;
+  }
+  
+  .plans .section-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  .plans .section-header h2 {
+    color: #0a1e3c;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .plans .section-header h2:after {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 3px;
+    background-color: #ffde00;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .plans .section-header p {
+    color: #555;
+    font-size: 1.1rem;
+  }
+  
+  .plans-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  
+  /* Pricing Table Styling */
+  .pricing-table {
+    background-color: #fff;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pricing-header {
+    display: flex;
+    background-color: #0a1e3c;
+    color: white;
+    padding: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .pricing-column {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .plan-category-wrapper {
+    border-bottom: 1px solid #eee;
+  }
+  
+  .plan-category-wrapper:last-child {
+    border-bottom: none;
+  }
+  
+  .plan-category-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f0f4f8;
+  }
+  
+  .plan-category-header h3 {
+    margin: 0;
+    color: #0a1e3c;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  
+  .plan-icon {
+    font-size: 1.5rem;
+    margin-right: 15px;
+  }
+  
+  .pricing-row {
+    display: flex;
+    border-top: 1px solid #eee;
+    transition: all 0.3s ease;
+  }
+  
+  .pricing-row:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+  }
+  
+  .pricing-row .timings {
+    color: #444;
+    font-weight: 500;
+  }
+  
+  .pricing-row .price {
+    color: #0a1e3c;
+    font-weight: 600;
+  }
+  
+  /* Full Day Styling */
+  .full-day {
+    background-color: #fffbeb;
+  }
+  
+  .full-day .plan-category-header {
+    background-color: #ffde00;
+  }
+  
+  .highlight-price {
+    color: #e63946 !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem;
+  }
+  
+  /* Booking CTA Styling */
+  .booking-cta {
+    background: linear-gradient(135deg, #0a1e3c 0%, #1a3a6c 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  .booking-cta h3 {
+    color: #ffde00;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+  }
+  
+  .phone-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: white;
+  }
+  
+  .operating-hours {
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+  }
+  
+  .operating-hours p {
+    margin: 5px 0;
+  }
+  
+  .book-button {
+    display: inline-block;
+    background-color: #ffde00;
+    color: #0a1e3c;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    margin-top: 10px;
+  }
+  
+  .book-button:hover {
+    background-color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .pricing-header {
+      display: none;
+    }
+    
+    .pricing-row {
+      flex-direction: column;
+      padding: 15px;
+      border-top: 1px solid #eee;
+    }
+    
+    .pricing-column {
+      text-align: left;
+      justify-content: flex-start;
+      padding: 8px 15px;
+    }
+    
+    .pricing-column.timings:before {
+      content: 'Time: ';
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    
+    .pricing-column.price:before {
+      content: 'Price: ';
+      font-weight: 600;
+      margin-right: 5px;
+    }
+    
+    .phone-number {
+      font-size: 2rem;
+    }
+  }
 
 /* FAQs Section */
 .faqs {
