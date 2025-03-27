@@ -62,9 +62,20 @@ router.post("/available-seats", async (req, res) => {
         .status(400)
         .json({ message: "Date and time slot are required." });
     }
+    // Calculate the start and end dates for the month
+    const startDate = new Date(date);
+    startDate.setDate(1);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
 
     // Find all bookings for the given date and time slot
-    const bookedSeats = await Booking.find({ date, timeSlot }, "seatNumber");
+    const bookedSeats = await Booking.find(
+      {
+        date: { $gte: startDate, $lt: endDate },
+        timeSlot,
+      },
+      "seatNumber"
+    );
     const bookedSeatNumbers = bookedSeats.map((booking) => booking.seatNumber);
 
     // Generate all seat numbers (assuming 40 seats)
