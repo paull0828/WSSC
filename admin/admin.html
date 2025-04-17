@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Admin Dashboard</h1>
+      </header>
+
+      <section class="price-management">
+        <h2>Update Seat Prices</h2>
+        <form id="priceForm">
+          <label for="plan">Select Plan:</label>
+          <select id="plan" name="plan">
+            <option value="3-hours">3 Hours</option>
+            <option value="4-hours">4 Hours</option>
+            <option value="7-hours">7 Hours</option>
+            <option value="10-hours">10 Hours</option>
+            <option value="full-day">Full Day</option>
+          </select>
+
+          <label for="newPrice">New Price (₹):</label>
+          <input type="number" id="newPrice" name="newPrice" required />
+
+          <button type="submit">Update Price</button>
+        </form>
+        <p id="priceMessage"></p>
+      </section>
+
+      <section class="user-management">
+        <h2>Manage Users</h2>
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- User rows will be populated dynamically -->
+          </tbody>
+        </table>
+      </section>
+    </div>
+    <section class="booking-management">
+      <h2>Booking Details</h2>
+      <table id="bookingTable">
+        <thead>
+          <tr>
+            <th>User Name</th>
+            <th>Email</th>
+            <th>Seat Number</th>
+            <th>Time Slot</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Booking rows will be populated dynamically -->
+        </tbody>
+      </table>
+    </section>
+
+    <script src="../js/admin.js"></script>
+  </body>
+</html>
