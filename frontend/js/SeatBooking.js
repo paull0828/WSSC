@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  // DOM Elements
   const seatsContainer = document.querySelector(".seats-container");
-  const timeSelection = document.querySelector(".time-selection");
   const planDropdown = document.getElementById("plan-selection");
   const timeSlotDropdown = document.getElementById("time-slot");
   const priceDisplay = document.getElementById("price-display");
@@ -8,51 +8,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   const confirmBookingBtn = document.getElementById("confirmBooking");
   const notification = document.getElementById("notification");
   const notificationMessage = document.getElementById("notification-message");
+  const notificationIcon = document.querySelector(".notification-icon");
   const backHomeBtn = document.getElementById("backHome");
+  const selectedSeatInfo = document.getElementById("selectedSeatInfo");
+  const loadingOverlay = document.getElementById("loadingOverlay");
 
+  // State variables
   let selectedSeat = null;
+  let currentBookings = [];
 
-  // Backend API URL
-  const API_URL = "http://localhost:4000"; // Ensure this matches your backend route
+  // Backend API URL - Update this to match your backend
+  const API_URL = "http://localhost:4000";
 
-  // Fetch available seats from backend
-  async function fetchAvailableSeats(date, timeSlot) {
-    try {
-      if (!date || !timeSlot) {
-        throw new Error("Date and time slot are required.");
-      }
-
-      const response = await fetch(`${API_URL}/bookings/available-seats`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ date, timeSlot }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const availableSeats = await response.json();
-      console.log("Available Seats:", availableSeats);
-
-      document.querySelectorAll(".seat").forEach((seat) => {
-        seat.classList.remove("booked", "selected");
-        seat.classList.add("available");
-        seat.disabled = false; // Enable all seats initially
-      });
-
-      availableSeats.forEach((seatNumber) => {
-        const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
-        if (seat) {
-          seat.classList.remove("available");
-          seat.classList.add("booked");
-          seat.disabled = true; // Disable booked seats
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching available seats:", error);
-    }
-  }
+  // Set minimum date to today
+  const today = new Date();
+  const formattedDate = today.toISOString().split("T")[0];
+  datePicker.min = formattedDate;
+  datePicker.value = formattedDate;
 
   // Time slots with pricing
   const timeSlots = {
@@ -83,16 +55,80 @@ document.addEventListener("DOMContentLoaded", async () => {
     "full-day": [{ time: "8 AM - 10 PM", price: 2000 }],
   };
 
-  // Generate 40 seats dynamically with a more organized layout
-  // Create 5 rows of 8 seats each
-  for (let row = 1; row <= 5; row++) {
-    for (let col = 1; col <= 8; col++) {
-      const seatNumber = (row - 1) * 8 + col;
+  /**
+   * Fetch available seats from backend
+   */
+  async function fetchAvailableSeats(date, timeSlot) {
+    try {
+      showLoading(true);
 
+      if (!date || !timeSlot) {
+        throw new Error("Date and time slot are required.");
+      }
+
+      const response = await fetch(`${API_URL}/available-seats`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ date, timeSlot }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      currentBookings = data.bookedSeats;
+
+      // Reset all seats to available
+      document.querySelectorAll(".seat").forEach((seat) => {
+        seat.classList.remove("booked", "selected");
+        seat.classList.add("available");
+      });
+
+      // Mark booked seats
+      currentBookings.forEach((seatNumber) => {
+        const seat = document.querySelector(`.seat[data-seat="${seatNumber}"]`);
+        if (seat) {
+          seat.classList.remove("available");
+          seat.classList.add("booked");
+        }
+      });
+
+      // If the previously selected seat is now booked, deselect it
+      if (
+        selectedSeat &&
+        currentBookings.includes(Number.parseInt(selectedSeat.dataset.seat))
+      ) {
+        selectedSeat.classList.remove("selected");
+        selectedSeat = null;
+        updateSelectedSeatInfo();
+        updateConfirmButtonState();
+      }
+
+      showLoading(false);
+    } catch (error) {
+      console.error("Error fetching available seats:", error);
+      showNotification(
+        "Failed to fetch available seats. Please try again.",
+        "error"
+      );
+      showLoading(false);
+    }
+  }
+
+  /**
+   * Generate seats in the seating layout
+   */
+  function generateSeats() {
+    seatsContainer.innerHTML = "";
+
+    for (let i = 1; i <= 40; i++) {
       const seat = document.createElement("div");
-      seat.classList.add("seat");
-      seat.textContent = seatNumber;
-      seat.dataset.seat = seatNumber;
+      seat.classList.add("seat", "available");
+      seat.textContent = i;
+      seat.dataset.seat = i;
 
       seat.addEventListener("click", () => {
         if (seat.classList.contains("booked")) {
@@ -100,82 +136,83 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
 
+        // Deselect previous seat if any
         if (selectedSeat) {
           selectedSeat.classList.remove("selected");
         }
 
+        // Select new seat
         selectedSeat = seat;
         seat.classList.add("selected");
 
-        if (window.innerWidth < 768) {
-          timeSelection.scrollIntoView({ behavior: "smooth" });
-        }
+        // Update selected seat info
+        updateSelectedSeatInfo();
 
-        resetSelections();
-        timeSelection.style.display = "block";
-
-        // Add a subtle animation to highlight the booking section
-        timeSelection.classList.add("booking-highlight");
+        // Update confirm button state
+        updateConfirmButtonState();
       });
 
       seatsContainer.appendChild(seat);
     }
   }
 
-  // Fetch available seats after rendering
-  await fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+  /**
+   * Update the selected seat information display
+   */
+  function updateSelectedSeatInfo() {
+    if (selectedSeat) {
+      selectedSeatInfo.innerHTML = `
+        <p>Selected Seat: <strong>${selectedSeat.dataset.seat}</strong></p>
+      `;
+    } else {
+      selectedSeatInfo.innerHTML = `<p>No seat selected</p>`;
+    }
+  }
 
-  // Reset all selections when date or time slot is changed
-  datePicker.addEventListener("change", () => {
-    fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
-  });
+  /**
+   * Update the state of the confirm button based on selections
+   */
+  function updateConfirmButtonState() {
+    const hasSelectedSeat = selectedSeat !== null;
+    const hasSelectedTimeSlot = timeSlotDropdown.value !== "";
 
-  timeSlotDropdown.addEventListener("change", () => {
-    fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
-  });
+    confirmBookingBtn.disabled = !(hasSelectedSeat && hasSelectedTimeSlot);
+  }
 
+  /**
+   * Reset form selections
+   */
   function resetSelections() {
     planDropdown.value = "";
     timeSlotDropdown.innerHTML =
       '<option value="" disabled selected>Select a Time Slot</option>';
-    priceDisplay.innerHTML = "Price: <span>₹0</span>";
+    priceDisplay.textContent = "₹0";
+    updateConfirmButtonState();
   }
 
-  planDropdown.addEventListener("change", () => {
-    const selectedPlan = planDropdown.value;
-    timeSlotDropdown.innerHTML =
-      '<option value="" disabled selected>Select a Time Slot</option>';
-
-    if (selectedPlan) {
-      timeSlots[selectedPlan].forEach((slot) => {
-        const option = document.createElement("option");
-        option.value = slot.time;
-        option.textContent = `${slot.time} (₹${slot.price})`;
-        option.dataset.price = slot.price;
-        timeSlotDropdown.appendChild(option);
-      });
-    }
-  });
-
-  timeSlotDropdown.addEventListener("change", () => {
-    const selectedOption =
-      timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
-    const price = selectedOption.dataset.price;
-    priceDisplay.innerHTML = `Price: <span>₹${price}</span>`;
-
-    // Animate the price change
-    const priceSpan = priceDisplay.querySelector("span");
-    priceSpan.style.transition = "all 0.3s ease";
-    priceSpan.style.transform = "scale(1.1)";
-    setTimeout(() => {
-      priceSpan.style.transform = "scale(1)";
-    }, 300);
-  });
-
+  /**
+   * Show notification message
+   */
   function showNotification(message, type = "success") {
     notificationMessage.textContent = message;
-    notification.style.backgroundColor =
-      type === "success" ? "var(--success)" : "var(--danger)";
+
+    // Set notification color and icon based on type
+    if (type === "success") {
+      notification.style.backgroundColor = "var(--success)";
+      notificationIcon.className = "notification-icon fas fa-check-circle";
+    } else if (type === "error") {
+      notification.style.backgroundColor = "var(--danger)";
+      notificationIcon.className =
+        "notification-icon fas fa-exclamation-circle";
+    } else if (type === "warning") {
+      notification.style.backgroundColor = "var(--warning)";
+      notificationIcon.className =
+        "notification-icon fas fa-exclamation-triangle";
+    } else if (type === "info") {
+      notification.style.backgroundColor = "var(--info)";
+      notificationIcon.className = "notification-icon fas fa-info-circle";
+    }
+
     notification.classList.add("show");
 
     setTimeout(() => {
@@ -183,101 +220,163 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 3000);
   }
 
-  confirmBookingBtn.addEventListener("click", async () => {
-    const email = localStorage.getItem("userEmail");
-    if (!selectedSeat) {
-      showNotification("Please select a seat first!", "error");
-      return;
+  /**
+   * Show/hide loading overlay
+   */
+  function showLoading(show) {
+    if (show) {
+      loadingOverlay.classList.add("show");
+    } else {
+      loadingOverlay.classList.remove("show");
     }
+  }
 
-    if (!timeSlotDropdown.value) {
-      showNotification("Please select a time slot!", "error");
-      return;
-    }
+  /**
+   * Initialize the booking page
+   */
+  async function initBookingPage() {
+    // Generate seats
+    generateSeats();
 
-    const seatNumber = selectedSeat.dataset.seat;
-    const date = datePicker.value;
-    const timeSlot = timeSlotDropdown.value;
-    const plan = planDropdown.value;
-    const selectedOption =
-      timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
-    const price = selectedOption.dataset.price;
+    // Set up event listeners
+    datePicker.addEventListener("change", () => {
+      if (timeSlotDropdown.value) {
+        fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+      }
+    });
 
-    // Validate date
-    const selectedDate = new Date(date);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+    planDropdown.addEventListener("change", () => {
+      const selectedPlan = planDropdown.value;
+      timeSlotDropdown.innerHTML =
+        '<option value="" disabled selected>Select a Time Slot</option>';
 
-    if (selectedDate < currentDate) {
-      showNotification("Cannot book a seat for a previous date!", "error");
-      return;
-    }
+      if (selectedPlan) {
+        timeSlots[selectedPlan].forEach((slot) => {
+          const option = document.createElement("option");
+          option.value = slot.time;
+          option.textContent = `${slot.time} (₹${slot.price})`;
+          option.dataset.price = slot.price;
+          timeSlotDropdown.appendChild(option);
+        });
+      }
 
-    // Add loading state to button
-    confirmBookingBtn.disabled = true;
-    confirmBookingBtn.innerHTML = `
-      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Processing...
-    `;
-    try {
-      const response = await fetch(`${API_URL}/bookings/book-seat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          seatNumber,
-          email,
-          date,
-          timeSlot,
-          plan,
-          price,
-        }),
-      });
-      // Simulate API delay for demo purposes
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      updateConfirmButtonState();
+    });
 
-      if (!response.ok) throw new Error("Failed to book the seat.");
+    timeSlotDropdown.addEventListener("change", () => {
+      if (timeSlotDropdown.selectedIndex > 0) {
+        const selectedOption =
+          timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
+        const price = selectedOption.dataset.price;
+        priceDisplay.textContent = `₹${price}`;
 
-      showNotification(`Seat ${seatNumber} booked for ${timeSlot}!`);
-      selectedSeat.classList.add("booked");
-      selectedSeat.classList.remove("selected");
-      selectedSeat = null;
+        // Animate the price change
+        priceDisplay.style.transition = "all 0.3s ease";
+        priceDisplay.style.transform = "scale(1.1)";
+        setTimeout(() => {
+          priceDisplay.style.transform = "scale(1)";
+        }, 300);
 
-      resetSelections();
-      timeSelection.style.display = "none";
-    } catch (error) {
-      console.error("Booking error:", error);
+        // Fetch available seats for the selected time slot
+        fetchAvailableSeats(datePicker.value, timeSlotDropdown.value);
+      } else {
+        priceDisplay.textContent = "₹0";
+      }
 
-      showNotification(`Failed to book seat: ${error.message}`, "error");
-    } finally {
-      // Reset button state
-      confirmBookingBtn.disabled = false;
-      confirmBookingBtn.innerHTML = `
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="icon"
-        >
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-        Confirm Booking
-      `;
-    }
-  });
+      updateConfirmButtonState();
+    });
 
-  backHomeBtn.addEventListener("click", () => {
-    showNotification("Returning to home page...");
-    setTimeout(() => {
-      window.location.href = "index2.html";
-    }, 1000);
-  });
+    confirmBookingBtn.addEventListener("click", async () => {
+      if (!selectedSeat) {
+        showNotification("Please select a seat first!", "error");
+        return;
+      }
+
+      if (!timeSlotDropdown.value) {
+        showNotification("Please select a time slot!", "error");
+        return;
+      }
+
+      const seatNumber = selectedSeat.dataset.seat;
+      const date = datePicker.value;
+      const timeSlot = timeSlotDropdown.value;
+      const plan = planDropdown.value;
+      const selectedOption =
+        timeSlotDropdown.options[timeSlotDropdown.selectedIndex];
+      const price = selectedOption.dataset.price;
+
+      // Validate date
+      const selectedDate = new Date(date);
+      const currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0); // Set time to midnight for comparison
+
+      if (selectedDate < currentDate) {
+        showNotification("Cannot book a seat for a previous date!", "error");
+        return;
+      }
+
+      // Show loading overlay
+      showLoading(true);
+
+      try {
+        const userEmail =
+          localStorage.getItem("userEmail") || "guest@example.com";
+
+        const response = await fetch(`${API_URL}/api/bookings/book-seat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            seatNumber,
+            email: userEmail,
+            date,
+            timeSlot,
+            plan,
+            price,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "Failed to book the seat. Please try again."
+          );
+        }
+
+        const data = await response.json();
+
+        // Show success notification
+        showNotification(
+          `Seat ${seatNumber} booked successfully for ${timeSlot}!`,
+          "success"
+        );
+
+        // Update UI to reflect the booking
+        selectedSeat.classList.add("booked");
+        selectedSeat.classList.remove("selected");
+        selectedSeat = null;
+
+        // Reset form
+        resetSelections();
+        updateSelectedSeatInfo();
+      } catch (error) {
+        console.error("Booking error:", error);
+        showNotification(
+          error.message || "Failed to book seat. Please try again.",
+          "error"
+        );
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    backHomeBtn.addEventListener("click", () => {
+      showNotification("Returning to home page...", "info");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1000);
+    });
+  }
+
+  // Initialize the booking page
+  initBookingPage();
 });

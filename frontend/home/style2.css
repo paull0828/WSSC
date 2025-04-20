@@ -185,6 +185,8 @@ nav {
 
 .nav-menu {
   display: flex;
+  justify-items: center;
+  align-items: center;
   gap: 1.5rem;
 }
 

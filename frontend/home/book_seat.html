@@ -3,146 +3,152 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Wisdom Self-Study Centre - Seat Booking</title>
-    <link rel="stylesheet" href="../css/styles3.css" />
+    <title>Wisdom Study Space - Seat Booking</title>
+    <link rel="stylesheet" href="/frontend/css/styles3.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
   </head>
   <body>
     <div class="container">
       <header>
         <div class="logo-container">
-          <div class="logo">W</div>
-          <h1>Wisdom Self-Study Centre</h1>
+          <img
+            src="assets/logo.png"
+            alt="Wisdom Study Space Logo"
+            class="logo-img"
+          />
+          <h1>Wisdom Study Space</h1>
         </div>
         <button id="backHome" class="btn-back">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="icon"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <i class="fas fa-arrow-left"></i>
           Back to Home
         </button>
       </header>
 
       <main>
-        <div class="card">
-          <section class="seat-selection">
-            <h2>Select Your Seat</h2>
-            <div class="legend">
-              <div class="legend-item">
-                <div class="seat-example available"></div>
-                <span>Available</span>
+        <div class="booking-wrapper">
+          <div class="card seat-card">
+            <section class="seat-selection">
+              <h2>Select Your Seat</h2>
+              <div class="legend">
+                <div class="legend-item">
+                  <div class="seat-example available"></div>
+                  <span>Available</span>
+                </div>
+                <div class="legend-item">
+                  <div class="seat-example selected"></div>
+                  <span>Selected</span>
+                </div>
+                <div class="legend-item">
+                  <div class="seat-example booked"></div>
+                  <span>Booked</span>
+                </div>
               </div>
-              <div class="legend-item">
-                <div class="seat-example selected"></div>
-                <span>Selected</span>
+
+              <div class="study-layout">
+                <div class="entrance">Entrance</div>
+                <div class="seats-container">
+                  <!-- Seats will be generated dynamically using JS -->
+                </div>
               </div>
-              <div class="legend-item">
-                <div class="seat-example booked"></div>
-                <span>Booked</span>
+
+              <div class="selected-seat-info" id="selectedSeatInfo">
+                <p>No seat selected</p>
               </div>
-            </div>
-            <div class="screen"></div>
-            <div class="seats-container">
-              <!-- Seats will be generated dynamically using JS -->
-            </div>
-          </section>
+            </section>
+          </div>
 
-          <section
-            class="time-selection booking-highlight"
-            style="display: none"
-          >
-            <h2>Booking Details</h2>
+          <div class="card booking-card">
+            <section class="time-selection">
+              <h2>Booking Details</h2>
 
-            <div class="form-group">
-              <label for="date-picker">Select Date</label>
-              <input type="date" id="date-picker" class="form-control" />
-            </div>
+              <div class="form-group">
+                <label for="date-picker">Select Date</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-calendar"></i>
+                  <input
+                    type="date"
+                    id="date-picker"
+                    class="form-control"
+                    min=""
+                  />
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label for="plan-selection">Select Plan</label>
-              <select id="plan-selection" class="form-control">
-                <option value="" disabled selected>Select a Plan</option>
-                <option value="3-hours">3 Hours</option>
-                <option value="4-hours">4 Hours</option>
-                <option value="7-hours">7 Hours</option>
-                <option value="10-hours">10 Hours</option>
-                <option value="full-day">Full Day</option>
-              </select>
-            </div>
+              <div class="form-group">
+                <label for="plan-selection">Select Plan</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-clock"></i>
+                  <select id="plan-selection" class="form-control">
+                    <option value="" disabled selected>Select a Plan</option>
+                    <option value="3-hours">3 Hours</option>
+                    <option value="4-hours">4 Hours</option>
+                    <option value="7-hours">7 Hours</option>
+                    <option value="10-hours">10 Hours</option>
+                    <option value="full-day">Full Day</option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label for="time-slot">Select Time Slot</label>
-              <select id="time-slot" class="form-control">
-                <option value="" disabled selected>Select a Time Slot</option>
-              </select>
-            </div>
+              <div class="form-group">
+                <label for="time-slot">Select Time Slot</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-hourglass-half"></i>
+                  <select id="time-slot" class="form-control">
+                    <option value="" disabled selected>
+                      Select a Time Slot
+                    </option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="price-container">
-              <p id="price-display">Price: <span>₹0</span></p>
-            </div>
+              <div class="price-container">
+                <div class="price-label">Price:</div>
+                <div id="price-display" class="price-value">₹0</div>
+              </div>
 
-            <button id="confirmBooking" class="btn-confirm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon"
-              >
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-              Confirm Booking
-            </button>
-          </section>
+              <button id="confirmBooking" class="btn-confirm" disabled>
+                <i class="fas fa-check"></i>
+                Confirm Booking
+              </button>
+            </section>
+          </div>
         </div>
       </main>
 
       <footer>
-        <p>&copy; 2025 Wisdom Self-Study Centre. All rights reserved.</p>
+        <div class="footer-content">
+          <p>&copy; 2025 Wisdom Study Space. All rights reserved.</p>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="plans.html">Plans</a>
+            <a href="index.html#contact">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
 
     <div id="notification" class="notification">
       <div class="notification-content">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="notification-icon"
-        >
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-          <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
+        <i class="notification-icon"></i>
         <p id="notification-message"></p>
       </div>
     </div>
 
-    <script src="../js/SeatBooking.js"></script>
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Processing your booking...</p>
+    </div>
+
+    <script src="/frontend/js/SeatBooking.js"></script>
   </body>
 </html>
