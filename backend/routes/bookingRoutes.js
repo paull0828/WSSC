@@ -61,7 +61,7 @@ router.post("/book-seat", async (req, res) => {
       timeSlot,
       plan,
       price,
-      createdAt: new Date(),
+      createdAt: new Date(date),
       expiresAt,
     });
 
