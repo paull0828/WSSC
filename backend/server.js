@@ -7,10 +7,11 @@ import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import userRoutes from "./routes/userRoute.js";
 import dotenv from "dotenv";
+import adminRoutes from "./routes/adminRoutes.js";
+import paymentRoutes from "./routes/payments.js";
 
 dotenv.config();
 
-// Initialize Express App
 const app = express();
 
 // Connect to MongoDB
@@ -33,7 +34,8 @@ app.use(
 app.use("/api", authRoutes);
 app.use("/bookings", bookingRoutes);
 app.use("/users", userRoutes);
-
+app.use("/admin", adminRoutes);
+app.use("/payment", paymentRoutes);
 // ✅ Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error("❌ Server Error:", err.message);
